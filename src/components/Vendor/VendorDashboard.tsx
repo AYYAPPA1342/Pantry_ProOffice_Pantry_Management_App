@@ -21,11 +21,17 @@ interface VendorDashboardProps {
 }
 
 export const VendorDashboard = ({ activeTab, onTabChange, onLogout }: VendorDashboardProps) => {
-  const revenueData = [
+  const summaryData = [
     { label: 'Monthly Revenue', value: '$12,450', icon: DollarSign },
     { label: 'Items Sold', value: '485', icon: Package },
     { label: 'Pending Receipts', value: '5', icon: Receipt },
     { label: 'Payment Status', value: 'Paid', icon: CheckCircle }
+  ];
+
+  const recentOrders = [
+    { item: 'Coffee', date: '2 hrs ago', quantity: 12, amount: '24.00' },
+    { item: 'Tea & Biscuits', date: '4 hrs ago', quantity: 3, amount: '8.25' },
+    { item: 'Snacks Bundle', date: '1 day ago', quantity: 8, amount: '15.60' }
   ];
 
   const [priceItems, setPriceItems] = useState([
@@ -50,137 +56,153 @@ export const VendorDashboard = ({ activeTab, onTabChange, onLogout }: VendorDash
       <LogOut className="h-5 w-5" />
     </Button>
   );
-
-  return (
-    <div className="min-h-screen bg-background pb-20">
-      <MobileLayout title="Vendor Portal" rightAction={logoutAction}>
-        <div className="p-4 space-y-6">
-          {/* Revenue Summary */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-foreground">Revenue Summary</h3>
-            <div className="grid grid-cols-2 gap-4">
-              {revenueData.map((item, index) => {
-                const Icon = item.icon;
-                return (
-                  <Card key={index} className="metric-card p-4">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <Icon className="h-5 w-5 text-primary" />
-                        <span className="text-sm font-medium text-muted-foreground">
-                          {item.label}
-                        </span>
-                      </div>
-                      <p className="text-xl font-bold text-foreground">{item.value}</p>
-                    </div>
-                  </Card>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Payment Status */}
-          <Card className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-muted-foreground">Payment Status</p>
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1">
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    <span className="text-sm font-medium text-foreground">Paid</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                    <span className="text-sm font-medium text-foreground">Pending</span>
-                  </div>
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'profile':
+        return (
+          <div className="space-y-6">
+            <Card className="p-6">
+              <h2 className="text-xl font-semibold mb-4">Vendor Profile</h2>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Vendor Name</label>
+                  <Input value="ABC Food Supplies" readOnly className="bg-muted" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Contact Email</label>
+                  <Input value="contact@abcfoodsupplies.com" readOnly className="bg-muted" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Phone</label>
+                  <Input value="+1 (555) 123-4567" readOnly className="bg-muted" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Business License</label>
+                  <Input value="BL-2024-001234" readOnly className="bg-muted" />
                 </div>
               </div>
-            </div>
-          </Card>
-
-          {/* Price Management */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-foreground">Price Management</h3>
-            <div className="space-y-3">
-              {priceItems.map((item) => (
-                <Card key={item.id} className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-1">
-                      <p className="font-medium text-foreground">{item.name}</p>
-                      <p className="text-sm text-muted-foreground">Current price per unit</p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm">$</span>
-                        <Input
-                          type="number"
-                          value={item.currentPrice.toFixed(2)}
-                          onChange={(e) => updatePrice(item.id, parseFloat(e.target.value) || 0)}
-                          className="w-20 h-8 text-center"
-                          step="0.01"
-                        />
-                      </div>
-                      <Button size="sm" variant="outline" className="h-8 w-8 p-0">
-                        <Edit2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
+            </Card>
           </div>
-
-          {/* Quick Actions */}
-          <div className="grid grid-cols-2 gap-4">
-            <Button className="h-16 flex flex-col items-center gap-2">
-              <Receipt className="h-5 w-5" />
-              <span className="font-semibold">View Receipts</span>
-            </Button>
-            
-            <Button variant="outline" className="h-16 flex flex-col items-center gap-2">
-              <Package className="h-5 w-5" />
-              <span className="font-semibold">Update Inventory</span>
-            </Button>
-          </div>
-
-          {/* Recent Transactions */}
-          <Card className="p-4">
-            <h3 className="text-lg font-semibold text-foreground mb-4">Recent Transactions</h3>
-            <div className="space-y-4">
-              {[
-                { item: 'Coffee', amount: '$24.00', time: '2 hrs ago', status: 'completed' },
-                { item: 'Tea & Biscuits', amount: '$8.25', time: '4 hrs ago', status: 'completed' },
-                { item: 'Snacks Bundle', amount: '$15.60', time: '1 day ago', status: 'pending' }
-              ].map((transaction, index) => (
-                <div key={index} className="flex items-center justify-between py-3 border-b border-border last:border-0">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-foreground">{transaction.item}</p>
-                    <p className="text-xs text-muted-foreground">{transaction.time}</p>
-                  </div>
-                  <div className="text-right space-y-1">
-                    <p className="text-sm font-medium text-foreground">{transaction.amount}</p>
-                    <div className="flex items-center gap-1">
-                      {transaction.status === 'completed' ? (
-                        <CheckCircle className="h-3 w-3 text-green-500" />
-                      ) : (
-                        <Clock className="h-3 w-3 text-yellow-500" />
-                      )}
-                      <span className="text-xs text-muted-foreground capitalize">
-                        {transaction.status}
-                      </span>
+        );
+        
+      case 'settings':
+        return (
+          <div className="space-y-6">
+            <Card className="p-6">
+              <h2 className="text-xl font-semibold mb-4">Settings</h2>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Notification Preferences</label>
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <input type="checkbox" id="email-notifications" defaultChecked />
+                      <label htmlFor="email-notifications" className="text-sm">Email notifications</label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input type="checkbox" id="sms-notifications" />
+                      <label htmlFor="sms-notifications" className="text-sm">SMS notifications</label>
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          </Card>
-        </div>
-      </MobileLayout>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Language</label>
+                  <select className="w-full p-2 border rounded-md">
+                    <option>English</option>
+                    <option>Spanish</option>
+                    <option>French</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Time Zone</label>
+                  <select className="w-full p-2 border rounded-md">
+                    <option>UTC-5 (Eastern Time)</option>
+                    <option>UTC-6 (Central Time)</option>
+                    <option>UTC-7 (Mountain Time)</option>
+                    <option>UTC-8 (Pacific Time)</option>
+                  </select>
+                </div>
+              </div>
+            </Card>
+          </div>
+        );
+        
+      default: // home tab
+        return (
+          <>
+            {/* Account Summary */}
+            <Card className="p-6 mb-6">
+              <h2 className="text-xl font-semibold mb-4">Account Summary</h2>
+              <div className="grid grid-cols-2 gap-4">
+                {summaryData.map((item, index) => {
+                  const Icon = item.icon;
+                  return (
+                    <div key={index} className="text-center">
+                      <Icon className="h-6 w-6 mx-auto mb-2 text-primary" />
+                      <p className="text-sm text-muted-foreground">{item.label}</p>
+                      <p className="text-lg font-semibold">{item.value}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </Card>
+
+            {/* Price Management */}
+            <Card className="p-6 mb-6">
+              <h2 className="text-xl font-semibold mb-4">Price Management</h2>
+              <div className="space-y-3">
+                {priceItems.map((item) => (
+                  <div key={item.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                    <span className="font-medium">{item.name}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">$</span>
+                      <Input
+                        type="number"
+                        value={item.currentPrice.toFixed(2)}
+                        onChange={(e) => updatePrice(item.id, parseFloat(e.target.value) || 0)}
+                        className="w-20 h-8 text-center"
+                        step="0.01"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <Button className="w-full mt-4">Update Prices</Button>
+            </Card>
+
+            {/* Recent Orders */}
+            <Card className="p-6">
+              <h2 className="text-xl font-semibold mb-4">Recent Orders</h2>
+              <div className="space-y-3">
+                {recentOrders.map((order, index) => (
+                  <div key={index} className="flex justify-between items-center py-2 border-b border-border last:border-0">
+                    <div>
+                      <p className="font-medium">{order.item}</p>
+                      <p className="text-sm text-muted-foreground">{order.date}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium">{order.quantity} units</p>
+                      <p className="text-sm text-muted-foreground">${order.amount}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </>
+        );
+    }
+  };
+
+  return (
+    <MobileLayout title="Vendor Dashboard" rightAction={logoutAction}>
+      <div className="space-y-6">
+        {renderContent()}
+      </div>
 
       <BottomNav 
         activeTab={activeTab} 
         onTabChange={onTabChange} 
         userRole="vendor" 
       />
-    </div>
+    </MobileLayout>
   );
 };
