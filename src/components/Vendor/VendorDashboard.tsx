@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,12 +28,18 @@ export const VendorDashboard = ({ activeTab, onTabChange, onLogout }: VendorDash
     { label: 'Payment Status', value: 'Paid', icon: CheckCircle }
   ];
 
-  const priceItems = [
+  const [priceItems, setPriceItems] = useState([
     { id: 'coffee', name: 'Coffee', currentPrice: 2.00 },
     { id: 'tea', name: 'Tea', currentPrice: 1.50 },
     { id: 'biscuits', name: 'Biscuits', currentPrice: 0.75 },
     { id: 'snacks', name: 'Snacks', currentPrice: 1.20 }
-  ];
+  ]);
+
+  const updatePrice = (itemId: string, newPrice: number) => {
+    setPriceItems(prev => prev.map(item => 
+      item.id === itemId ? { ...item, currentPrice: newPrice } : item
+    ));
+  };
 
   const logoutAction = (
     <Button 
@@ -107,6 +114,7 @@ export const VendorDashboard = ({ activeTab, onTabChange, onLogout }: VendorDash
                         <Input
                           type="number"
                           value={item.currentPrice.toFixed(2)}
+                          onChange={(e) => updatePrice(item.id, parseFloat(e.target.value) || 0)}
                           className="w-20 h-8 text-center"
                           step="0.01"
                         />
